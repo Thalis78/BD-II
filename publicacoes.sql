@@ -101,3 +101,13 @@ INSERT INTO AUTOR_LIVRO (AUTOR_CODIGO, LIVRO_CODIGO) VALUES
 (6, 6),
 (7, 8);
 
+-- 1. Livros que possuam preços superiores a R$ 50,00.
+SELECT * FROM LIVRO WHERE PRECO > 50
+-- 2. Livros que possuam preços entre R$ 100,00 e R$ 200,00.
+SELECT * FROM LIVRO WHERE PRECO >= 100 AND PRECO <= 200;
+-- 3. Livros cujos títulos possuam a palavra ‘Banco’.
+SELECT * FROM LIVRO WHERE TITULO LIKE "%Banco%";
+-- 4. Livros cujos títulos iniciam com a palavra ‘Banco’.
+SELECT * FROM LIVRO WHERE TITULO LIKE "Banco%";
+-- 5. Livros cujos títulos terminam com a palavra ‘Dados’.
+SELECT * FROM LIVRO WHERE TITULO LIKE "%Dados";

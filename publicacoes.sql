@@ -42,3 +42,62 @@ CREATE TABLE AUTOR_LIVRO (
     FOREIGN KEY (AUTOR_CODIGO) REFERENCES AUTOR(CODIGO),
     FOREIGN KEY (LIVRO_CODIGO) REFERENCES LIVRO(CODIGO)
 );
+
+INSERT INTO ASSUNTO (codigo, descricao) VALUES
+(1, 'Banco de Dados'),
+(2, 'Estruturas de Dados'),
+(3, 'Programação'),
+(4, 'Redes de Computadores'),
+(5, 'Engenharia de Software');
+
+INSERT INTO EDITORA (CODIGO, CNPJ, NOME) VALUES
+(1, '11111111000111', 'Books Editora'),
+(2, '22222222000122', 'Tech Press'),
+(3, '33333333000133', 'Alpha Editora'),
+(4, '44444444000144', 'Global Books'),
+(5, '55555555000155', 'Editora Antiga');
+
+INSERT INTO NACIONALIDADE (CODIGO, PAIS) VALUES
+(1, 'Brasil'),
+(2, 'Portugal'),
+(3, 'Estados Unidos'),
+(4, 'França'),
+(5, 'Argentina');
+
+INSERT INTO AUTOR (CODIGO, NOME, PASSAPORTE, DATANASCIMENTO, NACIONALIDADE_CODIGO) VALUES
+(1, 'Machado de Assis', 'BR0001', '1839-06-21', 1),
+(2, 'João Silva', 'BR0002', '1980-03-10', 1),
+(3, 'Luis Fernando', 'BR0003', '1975-08-15', 1),
+(4, 'Ana Souza', 'PT0004', '1990-01-20', 2),
+(5, 'John Doe', 'US0005', '1985-07-07', 3),
+(6, 'João Pedro', 'FR0006', '1965-12-01', 4),
+(7, 'Carlos Mendes', 'AR0007', '1915-05-30', 5);
+
+INSERT INTO LIVRO (CODIGO, ISBN, TITULO, PRECO, DATALANCAMENTO, ASSUNTO_CODIGO, EDITORA_CODIGO) VALUES
+(1, '9780000000001', 'Banco de Dados Moderno', 120.00, '2015-06-01', 1, 1),
+(2, '9780000000002', 'Bancos de Dados Avancados', 180.00, '2018-03-15', 1, 1),
+(3, '9780000000003', 'Estruturas de Dados em C', 75.00, '2010-09-10', 2, 2),
+(4, '9780000000004', 'Algoritmos e Estruturas', 95.00, '2012-05-20', 2, 2),
+(5, '9780000000005', 'Introducao a Programacao', 45.00, '2020-01-10', 3, 3),
+(6, '9780000000006', 'Programacao OO', 150.00, '2019-11-05', 3, 3),
+(7, '9780000000007', 'Redes de Computadores', 200.00, '2016-08-25', 4, 4),
+(8, '9780000000008', 'Engenharia de Software', 130.00, NULL, 5, 4),
+(9, '9780000000009', 'Banco de Dados Distribuidos', 220.00, '2021-04-01', 1, 5),
+(10,'9780000000010', 'Dados para Analise', 60.00, NULL, 1, 2);
+
+
+INSERT INTO AUTOR_LIVRO (AUTOR_CODIGO, LIVRO_CODIGO) VALUES
+(1, 1),
+(1, 2),
+(2, 1),
+(2, 3),
+(3, 2),
+(3, 6),
+(3, 9),
+(4, 5),
+(5, 7),
+(5, 10),
+(6, 4),
+(6, 6),
+(7, 8);
+

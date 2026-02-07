@@ -102,7 +102,7 @@ INSERT INTO AUTOR_LIVRO (AUTOR_CODIGO, LIVRO_CODIGO) VALUES
 (7, 8);
 
 -- 1. Livros que possuam preços superiores a R$ 50,00.
-SELECT * FROM LIVRO WHERE PRECO > 50
+SELECT * FROM LIVRO WHERE PRECO > 50;
 -- 2. Livros que possuam preços entre R$ 100,00 e R$ 200,00.
 SELECT * FROM LIVRO WHERE PRECO >= 100 AND PRECO <= 200;
 -- 3. Livros cujos títulos possuam a palavra ‘Banco’.
@@ -111,3 +111,15 @@ SELECT * FROM LIVRO WHERE TITULO LIKE "%Banco%";
 SELECT * FROM LIVRO WHERE TITULO LIKE "Banco%";
 -- 5. Livros cujos títulos terminam com a palavra ‘Dados’.
 SELECT * FROM LIVRO WHERE TITULO LIKE "%Dados";
+-- 6. Livros cujos títulos possuem a expressão ‘Banco de Dados’ ou ‘Bancos de Dados’.
+SELECT *  FROM LIVRO WHERE TITULO LIKE "%Banco de Dados%" OR TITULO LIKE "%Bancos de Dados%";
+-- 7. Livros que foram lançados há mais de 5 anos.
+SELECT * FROM LIVRO WHERE DATALANCAMENTO < '2021-02-07';
+-- 8. Livros que ainda não foram lançados, ou seja, com a data de lançamento nula.
+SELECT * FROM LIVRO WHERE NOT DATALANCAMENTO;
+-- 9. Livros cujo assunto seja ‘Estruturas de Dados’.
+SELECT * FROM LIVRO WHERE ASSUNTO_CODIGO IN(
+SELECT CODIGO FROM ASSUNTO WHERE DESCRICAO LIKE '%Estruturas de Dados%');
+-- 10. Livros cujo assunto tenha código 1, 2 ou 3.
+SELECT * FROM LIVRO WHERE ASSUNTO_CODIGO IN (1, 2, 3);
+

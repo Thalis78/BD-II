@@ -122,4 +122,13 @@ SELECT * FROM LIVRO WHERE ASSUNTO_CODIGO IN(
 SELECT CODIGO FROM ASSUNTO WHERE DESCRICAO LIKE '%Estruturas de Dados%');
 -- 10. Livros cujo assunto tenha código 1, 2 ou 3.
 SELECT * FROM LIVRO WHERE ASSUNTO_CODIGO IN (1, 2, 3);
-
+-- 11. Quantidade de livros.
+SELECT COUNT(*) FROM LIVRO;
+-- 12. Quantidade de livros que ainda não foram lançados, ou seja, com a data de lançamento nula.
+SELECT COUNT(*) FROM LIVRO WHERE DATALANCAMENTO IS NULL;
+-- 13. Soma dos preços dos livros.
+SELECT SUM(PRECO) FROM LIVRO;
+-- 14. Média de preços dos livros.
+SELECT AVG(PRECO) FROM LIVRO;
+-- 15. Maior preço dos livros.
+SELECT MAX(PRECO) FROM LIVRO;

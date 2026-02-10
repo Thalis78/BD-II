@@ -132,3 +132,17 @@ SELECT SUM(PRECO) FROM LIVRO;
 SELECT AVG(PRECO) FROM LIVRO;
 -- 15. Maior preço dos livros.
 SELECT MAX(PRECO) FROM LIVRO;
+-- 16. Menor preço dos livros. 
+SELECT MIN(PRECO) FROM LIVRO;
+-- 17. O preço médio dos livros para cada assunto. 
+SELECT ASSUNTO_CODIGO, AVG(PRECO) FROM LIVRO GROUP BY ASSUNTO_CODIGO;
+-- 18. Quantidade de livros para cada assunto. 
+SELECT ASSUNTO_CODIGO, COUNT(*) FROM LIVRO GROUP BY ASSUNTO_CODIGO;
+-- 19. O preço do livro mais caro de cada assunto, dentre aqueles que já foram lançados. 
+SELECT ASSUNTO_CODIGO, MAX(PRECO) FROM LIVRO WHERE DATALANCAMENTO IS NOT NULL GROUP BY ASSUNTO_CODIGO;
+-- 20. Quantidade de livros lançados por editora. 
+SELECT EDITORA_CODIGO, COUNT(*) FROM LIVRO WHERE EDITORA_CODIGO IS NOT NULL GROUP BY EDITORA_CODIGO;
+-- 21. Assuntos cujo preço médio dos livros ultrapassa R$ 50,00. 
+SELECT ASSUNTO_CODIGO, AVG(PRECO) FROM LIVRO GROUP BY ASSUNTO_CODIGO HAVING AVG(PRECO) > 50;
+-- 22. Assuntos que possuem pelo menos 2 livros. 
+SELECT ASSUNTO_CODIGO, COUNT(*) FROM `LIVRO` GROUP BY ASSUNTO_CODIGO HAVING COUNT(*) >=  2

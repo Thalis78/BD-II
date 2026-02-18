@@ -163,3 +163,98 @@ SELECT COUNT(*) AS QUANTIDADE_AUTORES FROM AUTOR;
  SELECT AVG(QTD_AUTORES) AS MEDIA_AUTORES_POR_LIVRO FROM (SELECT LIVRO_CODIGO, COUNT(AUTOR_CODIGO) AS QTD_AUTORES FROM AUTOR_LIVRO GROUP BY LIVRO_CODIGO) AS SUB;
 -- 30. Livros que possuem ao menos 2 autores.
 SELECT LIVRO_CODIGO FROM AUTOR_LIVRO GROUP BY LIVRO_CODIGO HAVING COUNT(AUTOR_CODIGO) >= 2;
+-- 31. Preço médio dos livros por editora.
+SELECT E.NOME,AVG(L.PRECO) AS MEDIA_VALORES FROM EDITORA E 
+INNER JOIN LIVRO L ON L.EDITORA_CODIGO = E.CODIGO 
+GROUP BY E.NOME;
+-- 32. Preço máximo, preço mínimo e preço médio dos livros cujos códigos do assunto são 1, 2 ou 3, para
+-- cada editora.
+SELECT E.NOME,AVG(L.PRECO) AS MEDIA_VALORES,MAX(L.PRECO) AS VALOR_MAX,MIN(L.PRECO) AS VALOR_MIN FROM EDITORA E 
+INNER JOIN LIVRO L ON L.EDITORA_CODIGO = E.CODIGO 
+WHERE L.ASSUNTO_CODIGO IN(1,2,3)
+GROUP BY E.NOME;
+-- 33. Quantidade de autores para cada nacionalidade.
+SELECT N.PAIS,COUNT(A.NOME) AS QUANT_AUTOR FROM NACIONALIDADE N
+INNER JOIN AUTOR A ON A.NACIONALIDADE_CODIGO = N.CODIGO 
+GROUP BY N.PAIS;
+-- 34. Quantidade de autores que nasceram antes de 1°de janeiro de 1920, para cada nacionalidade.
+SELECT N.PAIS,COUNT(A.NOME) AS QUANT_AUTOR FROM NACIONALIDADE N
+INNER JOIN AUTOR A ON A.NACIONALIDADE_CODIGO = N.CODIGO
+WHERE A.DATANASCIMENTO < '1920-01-01'
+GROUP BY N.PAIS;
+-- 35. A data de nascimento do autor mais velho.
+SELECT MIN(DATANASCIMENTO) FROM AUTOR;
+-- 36. A data de nascimento do autor mais novo.
+SELECT MAX(DATANASCIMENTO) FROM AUTOR;
+-- 37. Os novos preços dos livros se os valores fossem reajustados em 10%.
+SELECT L.PRECO AS PRECO_ANTIGO, (L.PRECO + (L.PRECO * 0.10)) AS PRECO_NOVO FROM LIVRO L;
+-- 38. O dia da publicação do livro de código 1.
+SELECT DATALANCAMENTO FROM LIVRO WHERE CODIGO IN (1);
+-- 39. O mês e o ano da publicação dos livros cujo assunto tem código 1.
+SELECT MONTH(DATALANCAMENTO) AS MES, YEAR(DATALANCAMENTO) AS ANO FROM LIVRO WHERE ASSUNTO_CODIGO IN(1) AND DATALANCAMENTO IS NOT NULL;
+-- 40. Quantidade de autores distintos que estão associados a livros na tabela AUTOR_LIVRO.
+SELECT COUNT(DISTINCT AUTOR_CODIGO) FROM AUTOR_LIVRO;
+-- 41. Título, assunto e preço, ordenado em ordem crescente por assunto e decrescente por preço.
+SELECT L.TITULO,A.DESCRICAO,L.PRECO FROM LIVRO L 
+INNER JOIN ASSUNTO A ON L.ASSUNTO_CODIGO = A.CODIGO
+ORDER BY A.DESCRICAO ASC,L.PRECO DESC;
+-- 42. Editoras ordenadas alfabeticamente. A coluna de nomes deve ter a palavra ‘Editora’ como título.
+SELECT E.NOME AS EDITORA FROM EDITORA E
+ORDER BY E.NOME ASC;
+-- 43. Preços e os títulos dos livros, em ordem decrescente de preço.
+SELECT L.TITULO , L.PRECO FROM LIVRO L
+ORDER BY L.PRECO DESC;
+-- 44. Editoras que já publicaram livros, sem repetições.
+SELECT DISTINCT E.NOME FROM EDITORA E
+INNER JOIN LIVRO L ON L.EDITORA_CODIGO = E.CODIGO
+ORDER BY E.NOME ASC;
+-- 45. Autores brasileiros com mês e ano de nascimento, por ordem decrescente de idade e por ordem
+-- crescente de nome do autor.
+SELECT MONTH(A.DATANASCIMENTO),YEAR(A.DATANASCIMENTO),A.NOME FROM AUTOR A
+INNER JOIN NACIONALIDADE N ON A.NACIONALIDADE_CODIGO = N.CODIGO
+WHERE N.PAIS = 'Brasil'
+ORDER BY A.DATANASCIMENTO ASC, A.NOME ASC;
+-- 46. Editora (nome da editora), assunto (código do assunto) e quantidade (livros publicados pela editora para
+-- cada assunto) em ordem decrescente de quantidade.
+SELECT E.NOME, A.CODIGO, COUNT(L.CODIGO) AS QUANTIDADE FROM EDITORA E
+INNER JOIN LIVRO L ON L.EDITORA_CODIGO = E.CODIGO
+INNER JOIN ASSUNTO A ON L.ASSUNTO_CODIGO = A.CODIGO
+GROUP BY E.NOME,A.CODIGO
+ORDER BY QUANTIDADE DESC;
+-- 47. Títulos cujo título tenha comprimento superior a 15 caracteres.
+SELECT TITULO FROM LIVRO WHERE CHAR_LENGTH(TITULO) > 15;
+-- 48. Títulos dos livros já lançados e a descrição dos seus assuntos.
+SELECT L.TITULO,A.DESCRICAO FROM LIVRO L
+INNER JOIN ASSUNTO A ON L.ASSUNTO_CODIGO = A.CODIGO
+WHERE DATALANCAMENTO IS NOT NULL;
+-- 49. Título do livro, nome da editora que o publicou e a descrição do assunto.
+SELECT L.TITULO,A.DESCRICAO,E.NOME FROM LIVRO L
+INNER JOIN ASSUNTO A ON L.ASSUNTO_CODIGO = A.CODIGO
+INNER JOIN EDITORA E ON L.EDITORA_CODIGO = E.CODIGO;
+-- 50. Editoras e títulos dos livros lançados pela editora, ordenada por nome da editora e pelo título do livro.
+SELECT E.NOME AS NOME_EDITORA, L.TITULO AS TITULO FROM EDITORA E
+INNER JOIN LIVRO L ON L.EDITORA_CODIGO = E.CODIGO
+WHERE L.DATALANCAMENTO IS NOT NULL
+ORDER BY NOME_EDITORA ASC,TITULO ASC;
+-- 51. Editoras cadastradas e para aquelas que possuem livros publicados, relacionar também o título do livro,
+-- em ordem de nome da editora e pelo título do livro.
+SELECT E.NOME AS NOME_EDITORA, L.TITULO AS TITULO FROM EDITORA E
+LEFT JOIN LIVRO L ON L.EDITORA_CODIGO = E.CODIGO
+ORDER BY NOME_EDITORA ASC, TITULO ASC;
+-- 52. Assuntos, contendo os títulos dos livros dos respectivos assuntos, ordenada pela descrição do assunto.
+SELECT A.DESCRICAO AS DESCRICAO_ASSUNTO, L.TITULO AS TITULO FROM ASSUNTO A
+LEFT JOIN LIVRO L ON L.ASSUNTO_CODIGO = A.CODIGO
+ORDER BY DESCRICAO_ASSUNTO ASC;
+-- 53. Títulos e editoras, relacionando a obra com a editora que a publica, quando for o caso.
+SELECT L.TITULO,E.NOME AS EDITORA FROM LIVRO L
+LEFT JOIN EDITORA E ON L.EDITORA_CODIGO = E.CODIGO;
+-- 54. Descrição de todos os assuntos e os títulos dos livros de cada um. Quando não existir um livro
+-- associado ao assunto, escrever o texto ‘Sem publicações’.
+SELECT A.DESCRICAO AS ASSUNTO, IFNULL(L.TITULO, 'SEM PUBLICAÇÕES') AS TITULO FROM ASSUNTO A
+LEFT JOIN LIVRO L ON L.ASSUNTO_CODIGO = A.CODIGO
+ORDER BY A.DESCRICAO ASC;
+-- 55. Nomes dos autores e os livros de sua autoria, ordenada pelo nome do autor.
+SELECT A.NOME AS AUTOR,L.TITULO FROM AUTOR A
+LEFT JOIN AUTOR_LIVRO AL ON A.CODIGO = AL.AUTOR_CODIGO
+LEFT JOIN LIVRO L ON AL.LIVRO_CODIGO = L.CODIGO
+ORDER BY A.NOME ASC;

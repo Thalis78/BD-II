@@ -311,3 +311,62 @@ HAVING COUNT(L.CODIGO) >= 10;
 SELECT DISTINCT E.NOME FROM EDITORA E
 INNER JOIN LIVRO L ON L.EDITORA_CODIGO = E.CODIGO
 WHERE L.DATALANCAMENTO IS NOT NULL;
+-- 66. Assuntos não foram lançados livros.
+SELECT A.DESCRICAO FROM ASSUNTO A
+WHERE NOT EXISTS (
+SELECT 1 FROM LIVRO L WHERE L.ASSUNTO_CODIGO = A.CODIGO);
+-- 67. Descrição dos assuntos e quantidade de livros lançados de cada um.
+SELECT A.DESCRICAO, COUNT(L.CODIGO) AS QUANTIDADE_LIVROS FROM ASSUNTO A
+LEFT JOIN LIVRO L ON L.ASSUNTO_CODIGO = A.CODIGO AND L.DATALANCAMENTO IS NOT NULL
+GROUP BY A.DESCRICAO;
+-- 68. Nome das editoras e o preço médio dos livros de cada uma.
+SELECT E.NOME, AVG(L.PRECO) FROM EDITORA E
+LEFT JOIN LIVRO L ON L.EDITORA_CODIGO = E.CODIGO
+GROUP BY E.NOME;
+-- 69. Nome das editoras e os livros das editoras que lançaram ao menos 2 livros, ordenados pelo nome da
+-- editora e pelo título da publicação.
+SELECT E.NOME,L.TITULO FROM EDITORA E
+INNER JOIN LIVRO L ON L.EDITORA_CODIGO = E.CODIGO
+WHERE E.CODIGO IN (
+SELECT EDITORA_CODIGO FROM LIVRO
+WHERE DATALANCAMENTO IS NOT NULL
+GROUP BY EDITORA_CODIGO
+HAVING COUNT(*) >= 2)
+ORDER BY E.NOME, L.TITULO;
+-- 70. Títulos dos livros dos assuntos cujo preço médio do livro é superior a R$ 40,00, juntamente com os
+-- respectivos assuntos.
+SELECT L.TITULO,A.DESCRICAO FROM LIVRO L
+INNER JOIN ASSUNTO A ON A.CODIGO = L.ASSUNTO_CODIGO
+WHERE L.ASSUNTO_CODIGO IN (
+SELECT ASSUNTO_CODIGO FROM LIVRO
+GROUP BY ASSUNTO_CODIGO
+HAVING AVG(PRECO) > 40);
+-- 71. Títulos dos livros cujo assunto é ‘Banco de Dados’ ou que foram lançados por editoras que contenham
+-- ‘Books’ no nome.
+SELECT L.TITULO FROM LIVRO L
+INNER JOIN ASSUNTO A ON A.CODIGO = L.ASSUNTO_CODIGO
+INNER JOIN EDITORA E ON E.CODIGO = L.EDITORA_CODIGO
+WHERE A.DESCRICAO = 'Banco de Dados' OR E.NOME LIKE '%Books%';
+
+-- 72. Títulos dos livros cujo assunto é ‘Banco de Dados’ e que foram lançados por editoras que contenham
+-- ‘Books’ no nome.
+SELECT L.TITULO FROM LIVRO L
+INNER JOIN ASSUNTO A ON A.CODIGO = L.ASSUNTO_CODIGO
+INNER JOIN EDITORA E ON E.CODIGO = L.EDITORA_CODIGO
+WHERE A.DESCRICAO = 'Banco de Dados' AND E.NOME LIKE '%Books%';
+-- 73. Títulos dos livros cujo assunto é ‘Banco de Dados’ e que não foram lançados por editoras que
+-- contenham ‘Books’ no nome.
+SELECT L.TITULO FROM LIVRO L
+INNER JOIN ASSUNTO A ON A.CODIGO = L.ASSUNTO_CODIGO
+INNER JOIN EDITORA E ON E.CODIGO = L.EDITORA_CODIGO
+WHERE A.DESCRICAO = 'Banco de Dados'AND E.NOME NOT LIKE '%Books%';
+-- 74. Títulos dos livros que não foram lançados por editoras que contenham ‘Books’ no nome cujo assunto é
+-- ‘Banco de Dados’.
+SELECT L.TITULO FROM LIVRO L
+INNER JOIN ASSUNTO A ON A.CODIGO = L.ASSUNTO_CODIGO
+INNER JOIN EDITORA E ON E.CODIGO = L.EDITORA_CODIGO
+WHERE E.NOME NOT LIKE '%Books%'AND A.DESCRICAO = 'Banco de Dados';
+-- 75. Excluir as editoras que não publicaram livros.
+DELETE FROM EDITORA
+WHERE CODIGO NOT IN (
+SELECT DISTINCT EDITORA_CODIGO FROM LIVRO);

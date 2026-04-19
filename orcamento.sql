@@ -214,3 +214,114 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
+
+-- QUESTÃO 06
+
+DELIMITER $$
+CREATE TRIGGER tg_calcula_falta_total
+AFTER INSERT ON produtos_para_requisicao
+FOR EACH ROW
+BEGIN
+    UPDATE Produtos 
+    SET produto_qtd_falta = (SELECT SUM(req_qtd_em_falta) FROM produtos_para_requisicao WHERE req_produto_codigo = NEW.req_produto_codigo)
+    WHERE produto_codigo = NEW.req_produto_codigo;
+END$$
+DELIMITER ;
+
+-- QUESTÃO 07
+
+CREATE TABLE historico_alteracao_precos (
+    hist_produto_codigo INT,
+    hist_data_alteracao DATETIME,
+    hist_valor_antigo DECIMAL(10, 2),
+    hist_valor_novo DECIMAL(10, 2),
+    hist_usuario_resp VARCHAR(50)
+);
+
+DELIMITER $$
+CREATE TRIGGER tg_historico_precos
+AFTER UPDATE ON Produtos
+FOR EACH ROW
+BEGIN
+    IF NEW.produto_valor <> OLD.produto_valor THEN
+        INSERT INTO historico_alteracao_precos (hist_produto_codigo, hist_data_alteracao, hist_valor_antigo, hist_valor_novo, hist_usuario_resp)
+        VALUES (NEW.produto_codigo, NOW(), OLD.produto_valor, NEW.produto_valor, USER());
+    END IF;
+END$$
+DELIMITER ;
+
+-- QUESTÃO 08
+
+CREATE TABLE audit_dados_antigos (id INT, descricao VARCHAR(100), preco DECIMAL(10,2), estoque INT, falta INT);
+CREATE TABLE audit_dados_novos (id INT, descricao VARCHAR(100), preco DECIMAL(10,2), estoque INT, falta INT);
+
+DELIMITER $$
+CREATE TRIGGER tg_auditoria_completa_produtos
+AFTER UPDATE ON Produtos
+FOR EACH ROW
+BEGIN
+    INSERT INTO audit_dados_antigos VALUES (OLD.produto_codigo, OLD.produto_descricao, OLD.produto_valor, OLD.produto_qtd_estoque, OLD.produto_qtd_falta);
+    INSERT INTO audit_dados_novos VALUES (NEW.produto_codigo, NEW.produto_descricao, NEW.produto_valor, NEW.produto_qtd_estoque, NEW.produto_qtd_falta);
+END$$
+DELIMITER ;
+
+-- QUESTÃO 09
+
+DELIMITER $$
+CREATE PROCEDURE sp_baixa_estoque_instrucao_unica(IN p_codigo INT, IN p_qtd_saida INT)
+BEGIN
+    UPDATE Produtos 
+    SET produto_qtd_estoque = produto_qtd_estoque - p_qtd_saida 
+    WHERE produto_codigo = p_codigo 
+      AND produto_qtd_estoque >= p_qtd_saida;
+    IF ROW_COUNT() = 0 THEN
+        INSERT INTO registro_vendas_sem_estoque (data_evento, usuario_tentativa, prod_id, qtd_tentada)
+        VALUES (CURDATE(), USER(), p_codigo, p_qtd_saida);
+    END IF;
+END $$
+DELIMITER ;
+
+-- QUESTÃO 10
+
+CREATE TABLE arquivos_orcamentos_finalizados (arq_orc_codigo INT, arq_orc_data DATE, arq_orc_status INT);
+CREATE TABLE arquivos_itens_finalizados (arq_orc_id INT, arq_prod_id INT, arq_qtd INT, arq_vlr DECIMAL(10,2));
+
+DELIMITER $$
+CREATE PROCEDURE sp_finaliza_orcamento_arquivo(IN p_orc_codigo INT)
+BEGIN
+    INSERT INTO arquivos_itens_finalizados SELECT orcamento_codigo, produto_codigo, item_quantidade, item_valor_unitario FROM Orcamentos_Produtos WHERE orcamento_codigo = p_orc_codigo;
+    INSERT INTO arquivos_orcamentos_finalizados SELECT orcamento_codigo, orcamento_data, orcamento_status FROM Orcamentos WHERE orcamento_codigo = p_orc_codigo;
+    
+    DELETE FROM Orcamentos_Produtos WHERE orcamento_codigo = p_orc_codigo;
+    DELETE FROM Orcamentos WHERE orcamento_codigo = p_orc_codigo;
+END$$
+DELIMITER ;
+
+-- QUESTÃO 11
+
+ALTER TABLE Produtos ADD COLUMN produto_estoque_minimo INT DEFAULT 5;
+CREATE TABLE requisicao_compras_estoque (req_id_prod INT, req_saldo_atual INT, req_qtd_necessaria INT);
+
+DELIMITER $$
+CREATE PROCEDURE sp_checar_estoque_minimo(IN p_codigo INT)
+BEGIN
+    DECLARE v_saldo, v_min INT;
+    SELECT produto_qtd_estoque, produto_estoque_minimo INTO v_saldo, v_min FROM Produtos WHERE produto_codigo = p_codigo;
+    
+    IF v_saldo < v_min THEN
+        INSERT INTO requisicao_compras_estoque VALUES (p_codigo, v_saldo, (v_min - v_saldo));
+    END IF;
+END$$
+DELIMITER ;
+
+-- QUESTÃO 12
+
+DELIMITER $$
+CREATE PROCEDURE sp_reajuste_preco_percentual(IN p_codigo INT, IN p_taxa DECIMAL(5,2))
+BEGIN
+    UPDATE Produtos 
+    SET produto_valor = produto_valor * (1 + (p_taxa / 100))
+    WHERE produto_codigo = p_codigo;
+END$$
+DELIMITER ;
+
